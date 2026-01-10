@@ -57,12 +57,21 @@ ENV WRANGLER_SEND_METRICS=false \
 # Note: API keys should be provided at runtime via docker run -e or docker-compose
 # Example: docker run -e OPENAI_API_KEY=your_key_here ...
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy your local custom CA certificate
+COPY custom_certificate/k3s-ca.crt /usr/local/share/ca-certificates/k3s-ca.crt
+
+# Update system CA trust store
+RUN update-ca-certificates
+
 # Install curl for healthchecks and copy bindings script
 RUN apt-get update && apt-get install -y --no-install-recommends curl \
   && rm -rf /var/lib/apt/lists/*
 
 RUN npm install -g wrangler
-RUN npm install -g @remix-run/serve
 
 # Copy built files and scripts
 COPY --from=prod-deps /app/build /app/build
@@ -84,7 +93,7 @@ HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=5 \
   CMD curl -fsS http://localhost:5173/ || exit 1
 
 # Start using dockerstart script with Wrangler
-CMD ["pnpm", "run", "start:prod"]
+CMD ["pnpm", "run", "dockerstart"]
 
 
 # ---- development stage ----
