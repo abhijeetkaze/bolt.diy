@@ -62,6 +62,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl \
   && rm -rf /var/lib/apt/lists/*
 
 RUN npm install -g wrangler
+RUN npm install -g @remix-run/serve
 
 # Copy built files and scripts
 COPY --from=prod-deps /app/build /app/build
