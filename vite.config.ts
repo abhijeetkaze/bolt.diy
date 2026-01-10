@@ -13,6 +13,8 @@ dotenv.config();
 
 export default defineConfig((config) => {
   return {
+    host: true,
+    allowedHosts: 'all',
     define: {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     },
